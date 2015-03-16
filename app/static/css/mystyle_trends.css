@@ -1,0 +1,146 @@
+* {
+    padding: 0;
+    margin: 0;
+     
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+
+html, body{
+    width: 100%;
+    height: auto;
+}
+
+
+
+svg {
+    display: block;
+}
+
+text {
+    font: 12px sans-serif;
+}
+
+div.navbar{
+    background-color: #333;
+    width: 100%;
+    height: 50px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+h2.project{
+    color:#fff;
+    float: left;
+    padding-top: 5px;
+    font-weight: 700;
+}
+
+
+.nav {
+    color:#fff;
+    padding-top: 10px;
+    float: right;
+}
+.nav > li {
+    color:#fff;
+    display: inline-block;
+}
+
+.nav > li + li {
+    margin-left: 20px;
+}
+
+.nav > li > a {
+    color: #fff;
+    color: rgba(255,255,255, 0.8);
+    font-size: 16px;
+}
+
+.nav > li > a:link,
+.nav > li > a:visited {
+    text-decoration: none;
+}
+
+.nav > li > a:hover {
+    text-decoration: underline;
+    color: #fff;
+}
+
+.summary, .texts {
+    color: #000;
+    margin: 10px;
+}
+
+svg {
+    width: 100%;
+    height: 470px;
+}
+
+
+.header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+}
+
+.topic-container {
+    float: left;
+    width: 20%;
+    height: 1000px;
+}
+
+.topic-container > .header {
+    margin: 10px 0 0 0;
+}
+
+.button-container {
+    width: 100%;
+/*    float: left;
+    width: 20%;*/
+    height: 950px;
+    overflow: scroll;
+/*    margin: 10px 0 0 0;*/
+}
+
+.button {
+    font-size: 14px;
+    text-align: center;
+    width: 90%;
+    height: 20px;
+    margin-left: 5%;
+}
+.trend-container {
+    float: right;
+    width: 79%;
+    height: 1000px;
+}
+
+.trend{
+    width: 100%;
+    height: 485px;
+    margin: 10px 0 0 0;
+}
+
+.activetopic{
+    width: 100%;
+    height: 30px;
+    /*overflow: scroll;*/
+}
+
+.abutton {
+    font-size: 14px;
+    text-align: center;
+    width: 20%;
+    height: 20px;
+    display: inline-block;
+}
+
+
+
+
+
+

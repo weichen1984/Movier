@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="../static/css/mystyle_pick.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+  <div class='navbar'>
+    <h2 class="project">Movier</h2>
+    <nav>
+      <ul class="nav">
+        <li><a href="/#">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="#">PickAMovie</a></li>
+        <li><a href="/trends">Trends</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class='upload'>
+        <h1>Upload a subtitle/script text file</h1>
+        <form action="/predict" method=post enctype=multipart/form-data>
+            <input type=file name=file>
+            <input type=submit value=Upload>
+        </form>
+
+        <div class="note">
+        <p> Note: for now 
+            <ul> 
+            <li> 1. you have to download english subtitles from 
+            <a href="http://www.opensubtitles.org" target="_blank">opensubtitles.org</a> or 
+            <a href="http://subscene.com" target="_blank">subscene.com</a> 
+            and upload here to make a prediction;
+            </li>
+            <li> 2. the model (<a href="http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html">Random Forest Regressor</a>) I use to predict boxoffice of a movie has an R square (the precentage of variance reduced) of about 27%, and this value is achieved solely based on the subtitle of the movies;
+            </li> 
+            <li> 3. the fractional box office is naively calculated by multiplying the fraction one topic is within a movie and the box office of this movie, and the median value within a year is taken for plotting. 
+            </li>
+            </ul>
+        </p>
+        </div>
+  </div>
+
+
+</body>
+</html>

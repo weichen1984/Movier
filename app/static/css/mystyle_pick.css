@@ -1,0 +1,86 @@
+* {
+    padding: 0;
+    margin: 0;
+     
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+
+html, body{
+    width: 100%;
+    height: auto;
+}
+
+body{
+    background-image: url('../images/movietheater.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+svg {
+    display: block;
+}
+
+text {
+    font: 12px sans-serif;
+    color: #fff;
+}
+
+div.navbar{
+    background-color: #333;
+    width: 100%;
+    height: 50px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+h2.project{
+    color:#fff;
+    float: left;
+    padding-top: 5px;
+    font-weight: 700;
+}
+
+
+.nav {
+    color:#fff;
+    padding-top: 10px;
+    float: right;
+}
+.nav > li {
+    color:#fff;
+    display: inline-block;
+}
+
+.nav > li + li {
+    margin-left: 20px;
+}
+
+.nav > li > a {
+    color: #fff;
+    color: rgba(255,255,255, 0.8);
+    font-size: 16px;
+}
+
+.nav > li > a:link,
+.nav > li > a:visited {
+    text-decoration: none;
+}
+
+.nav > li > a:hover {
+    text-decoration: underline;
+    color: #fff;
+}
+
+.note {
+    padding: 30px;
+}
+
+ul {
+    padding: 30px;
+}
+
+.upload {
+    color: #fff;
+}

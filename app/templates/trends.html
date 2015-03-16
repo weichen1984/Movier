@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="../static/d3.js"></script>
+  <script src="../static/nv.d3.js"></script>
+  <link href="../static/nv.d3.css" rel="stylesheet" type="text/css">
+  <link href="../static/css/mystyle_trends.css" rel="stylesheet" type="text/css">
+  <title>Movie Topic Trends</title>
+  <script>
+
+  </script>
+</head>
+
+<body>
+
+  <div class='navbar'>
+    <h2 class="project">Movier</h2>
+    <nav>
+      <ul class="nav">
+        <li><a href="/#">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/pickamovie">PickAMovie</a></li>
+        <li><a href="#">Trends</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class='summary'>
+    <h4>Interactive visualization of trends of each topic (importance to movies and popularity based on box office) over the history of the movie industry. Click on the buttons for each topic. </h4>
+  </div>
+
+  <div class='topic-container'>
+    <div class='header'>
+      <h3>TOPICS</h3>
+    </div>
+    <div class='button-container'>
+    </div>
+  </div>
+
+  <div class='trend-container'>
+    <div class='trend topic'>
+      <div class='header'>
+        <h3>TOPIC OCCURRENCE TREND</h3>
+      </div>
+      <div id="chart">
+        <svg class="area topic"></svg>
+      </div>
+    </div>
+
+    <div class='activetopic'>
+    </div>
+
+    <div class='trend boxoffice'>
+      <div class='header'>
+        <h3>TOPIC POPULARITY TREND</h3>
+      </div>
+      <div id="chart">
+        <svg class="area boxoffice"></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class='footnote'>
+  </div>
+    
+  
+  <script defer>
+
+    // store topic indices, labels and colors from topic_info.json file
+    // var info;
+    d3.json("../static/files/words.json", function(error, words){
+    d3.json("../static/files/topic_info.json", function(error, data){
+      d3.json("../static/files/W.json", function(error, Wdata){
+        d3.json("../static/files/P.json", function(error, Pdata){
+
+
+          // Global variables:
+          var active_topics = ["1", "18", "155"];
+          var tooltip = d3.select(".button-container")
+                          .append("div")
+                          .style("position", "absolute")
+                          .style("z-index", "10")
+                          .style("visibility", "hidden")
+                          .style("color", "#000000")
+                          .style("font-size", "14px")
+                          .style("width", "30%")
+                          .style("background-color", "#FFFFFF");
+
+
+          // Add buttons for each topic:
+          function addButtons(){
+            var buttons = d3.select(".button-container")
+            var index, name, color;
+            for (index in data) {
+              buttons.data([index])
+              .append("div")
+              .attr("class", "button")
+              .style("background-color", data[index]["colors"])
+              .style("cursor", "pointer")
+              .on("click", clickTopics)
+              .on("mouseover", showtext)
+              .on("mousemove", movetext)
+              .on("mouseout", hidetext)
+              .text(data[index]["names"]);
+            }
+          }
+
+          // Add buttons for each active topic:
+          function addaButtons(){
+            d3.selectAll(".abutton").remove();
+            var buttons = d3.select(".activetopic")
+            var index, name, color;
+            for (index of active_topics) {
+              buttons.data([index])
+              .append("div")
+              .attr("class", "abutton")
+              .style("background-color", data[index]["colors"])
+              .style("cursor", "pointer")
+              .on("click", clickTopics)
+              .on("mouseover", showtext)
+              .on("mousemove", movetext)
+              .on("mouseout", hidetext)
+              .text(data[index]["names"]);
+            }
+          }
+
+          // Create W chart:
+          function create_w_chart(wdt){
+            nv.addGraph(function(){
+            var chart = nv.models.lineChart()
+              .margin({left: 100})  
+              .useInteractiveGuideline(true)
+              .showLegend(true) 
+              .showYAxis(true)
+              .showXAxis(true)
+              .interpolate("monotone");
+
+            chart.xAxis     //Chart x-axis settings
+                .axisLabel('Year')
+                .tickFormat(d3.format('r'));
+
+            chart.yAxis
+                .axisLabel('Topic Occurrence Index')
+                .tickFormat(d3.format('.04f'));
+   
+            d3.select('#chart svg.topic')
+                .datum(wdt)
+                .call(chart);
+
+            nv.utils.windowResize(function() { chart.update() });
+
+            return chart;
+            })
+          }
+
+          // Create W chart:
+          function create_p_chart(pdt){
+            nv.addGraph(function(){
+            var chart = nv.models.lineChart()
+              .margin({left: 100})  
+              .useInteractiveGuideline(true)
+              .showLegend(true) 
+              .showYAxis(true)
+              .showXAxis(true)
+              .interpolate("monotone");
+
+            chart.xAxis     //Chart x-axis settings
+                .axisLabel('Year')
+                .tickFormat(d3.format('r'));
+
+            chart.yAxis
+                .axisLabel('Fractional Box Office')
+                .tickFormat(d3.format('d'));
+   
+            d3.select('#chart svg.boxoffice')
+                .datum(pdt)
+                .call(chart);
+
+            nv.utils.windowResize(function() { chart.update() });
+
+            return chart;
+            })
+          }
+
+
+          // Get data
+          function get_data(xdata){
+            var dt = [];
+            for (var index of active_topics) {
+              var tp = [];
+              for (var year in xdata[index]){
+                tp.push({x: +year, y: +xdata[index][year]});
+              }
+              dt.push({values: tp, key: data[index]["names"], color: data[index]["colors"], area: true});
+            }
+            return dt;
+          }
+
+
+          // Plot topics stored in global variable "active_topics"
+          function plotTopics(){
+            var data1 = get_data(Wdata);
+            var data2 = get_data(Pdata);
+            create_w_chart(data1);
+            create_p_chart(data2);
+            addaButtons();
+          }
+
+
+          // What happends if a button is clicked
+          function clickTopics(d){
+            index = active_topics.indexOf(d)
+            if (index === -1){
+              active_topics.push(d);
+            } else {
+              active_topics.splice(index, 1);
+            }
+            plotTopics();
+            console.log(d, active_topics)
+          }
+
+          // show text when hover
+          function showtext(d){
+            return tooltip
+                    .style("visibility", "visible")
+                    .text(words[d]);
+          }
+
+          // move text when moving mouse
+          function movetext(){
+            return tooltip
+                    .style("top", (event.pageY-10)+"px")
+                    .style("left", (event.pageX+10)+"px");
+          }
+
+          // hide text when mouse off
+          function hidetext(){
+            return tooltip
+                    .style("visibility", "hidden")
+          }
+
+
+          addButtons(data);
+          plotTopics();
+        })
+      })
+    })
+    })
+
+
+
+    // d3.json("../static/files/W.json", draw1);
+    // d3.json("../static/files/P.json", draw2);
+
+
+
+  </script>
+  
+</body>
+  
+</html>
+    

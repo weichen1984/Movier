@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="../static/d3.js"></script>
+    <script src="../static/nv.d3.js"></script>
+    <link href="../static/nv.d3.css" rel="stylesheet" type="text/css">
+    <link href="../static/css/mystyle_about.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+    <div class='navbar'>
+        <h2 class="project">Movier</h2>
+        <nav>
+            <ul class="nav">
+                <li><a href="/#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="/pickamovie">PickAMovie</a></li>
+                <li><a href="/trends">Trends</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class='summary'>
+        <b>Movier</b> is a data science project (Natural Language Processing, <a href="http://en.wikipedia.org/wiki/Natural_language_processing">NLP</a>) on <a href="http://en.wikipedia.org/wiki/Topic_model"><i>TOPIC MODELING</i></a> and <i>TREND ANALYSIS</i> for US feature movies from year 1914 to year 2014 based on their English subtitles / scripts. It also explores how predictive the extracted topics can be to the box office. 
+    </div>
+
+
+
+
+
+
+    <div class='page-content'>
+
+
+
+    <div class='motivation'>
+        <a name="motivation"></a>
+        <div class='header'>
+            <h3>Motivation</h3>
+        </div>
+        <div class='content'>
+            <p> Movie is an industry of art where romance meets economics. </p>
+            <br>
+
+            <p>Directors want to make movies with artistic values, producers want to produce movies with business values, while audience want to watch movies to their widely varied tastes. </p>
+
+            <br>
+
+            <p>The best situation of course is to have a movie with great values both in art and business. However this is a rare case. The three parties are constantly looking for a state of equilibrium. </p>
+
+            <br>
+
+            <p>Movier, this project, serves two purpose: 
+            <ul>
+                <li> explore the time evolution of feature movies produced in the US based on their screenplay / subtitles in terms of topics and features,</li> 
+                <li>to some extend answer the question that given the screenplay how likely this movie is going to make money based on the trend analysis and box office value.</li>
+
+            </ul>
+            </p>
+        </div>
+    </div>
+
+    <div class='data'>
+        <a name='data'></a>
+        <div class='header'>
+            <h3>Data</h3>
+        </div>
+        <div class='sub-header'>
+            <h4>Data Source: </h4>
+        </div>
+        <div class='content'>
+          <p> General Movie Information (ID, title, year, box office): <a href="http://www.imdb.com/">IMDb</a> </p> <br>
+          <p> Movie English Subtitles: <a href="http://www.opensubtitles.org/">opensubtitles.org</a> and <a href="http://subscene.com/">subscene.com</a> </p> 
+        </div>
+        <div class='sub-header'>
+            <h4>Data Scope: </h4>
+        </div>
+        <div class='content'>
+            <p> The data set used in this project consists of English subtitles for the 12,193 movies out of a total of 59,690 feature movies produced in the US up to year 2014. Among the 12,193 movies, 6687 have domestic box office (US) available. </p>
+        </div>
+        <div id="chart">
+            <svg class="count"></svg>
+        </div>
+    </div>
+
+    <div class='analysis'>
+        <div class='header'>
+            <h3><a name='analysis'>Analysis</a></h3>
+        </div>
+        <div class='content'>
+            <p> Scrape data from the data sources as mentioned above and dump them into MongoDB </p>
+            <br>
+            <p> Clean data so that each item corresponds to one IMDb ID and has attributes such as texts for subtitles, various ratings, release date, box office and etc </p>
+            <br>
+            <p> Run TF-IDF on subtitles </p>
+            <br>
+            <p> Perform a Non-Negative Matrix Factorization on the TF-IDF matrix</p>
+            <br>
+            <p>Investigate the features and pick the top K1 latent features</p>
+            <br>
+            <p>Analyze and visualize the change of these features over time</p>
+        </div>
+    </div>
+
+    <div class='documentation'>
+        <a name='app'></a>
+    </div>
+
+    <div class='tools'>
+        <a name='tools'></a>
+    </div>
+
+    <div class='credits'>
+        <a name='credits'></a>
+    </div>
+
+    </div>
+
+
+    <div class='nav-buttons'>
+        <div class='button motivation'>
+            <a href='#motivation'>Motivation</a>
+        </div>
+        <div class='button data'>
+            <a href='#data'>Data</a>
+        </div>
+        <div class='button analysis'>
+            <a href='#analysis'>Analysis</a>
+        </div>
+        <div class='button documentation'>
+            <a href='#app'>Documentation</a>
+        </div>
+        <div class='button tools'>
+            <a href='#tools'>Tools</a>
+        </div>
+        <div class='button credits'>
+            <a href='#credits'>Credits</a>
+        </div>
+    </div>
+
+
+    <script>
+
+        d3.json("../static/files/N.json", function(error, data){
+            var pdata = [];
+            var colors = ["#D250EC", "#404313", "#E6382C"]
+            var keys = Object.keys(data)
+
+            // for (var key in data) {
+            for (var i = 0; i < keys.length; i++){
+                var temp = [];
+                var key = keys[i];
+                var color = colors[i];
+                for (var year in data[key]) {
+                  temp.push({x: +year, y: +data[key][year]});
+                }
+                pdata.push({values:temp, key:key, color:color});
+            }
+
+            nv.addGraph(function(){
+                var chart = nv.models.multiBarChart()
+                    // .transitionDuration(350)
+                    .reduceXTicks(true)
+                    .rotateLabels(0)
+                    .showControls(true)
+                    .groupSpacing(0.1)
+                    ;
+
+                chart.xAxis     //Chart x-axis settings
+                    .axisLabel('Year')
+                    .tickFormat(d3.format('r'));
+
+                chart.yAxis     //Chart y-axis settings
+                    .axisLabel('Counts')
+                    .tickFormat(d3.format('r'));
+
+                /* Done setting the chart up? Time to render it!*/
+                // var myData = sinAndCos();   //You need data...
+
+                d3.select('#chart svg.count')    //Select the <svg> element you want to render the chart in.   
+                    .datum(pdata)         //Populate the <svg> element with chart data...
+                    .call(chart);          //Finally, render the chart!
+
+                //Update the chart when window resizes.
+                nv.utils.windowResize(function() { chart.update() });
+                return chart;
+              })
+            });
+  
+
+    </script>
+
+
+
+
+
+</body>
+</html>

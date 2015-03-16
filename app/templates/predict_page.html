@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link href='../static/css/mystyle_predict.css' rel="stylesheet" type="text/css">
+  <script src="../static/d3.js"></script>
+  <script src="../static/nv.d3.js"></script>
+  <link href="../static/nv.d3.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+
+  <div class='navbar'>
+    <h2 class="project">Movier</h2>
+    <nav>
+      <ul class="nav">
+        <li><a href="/#">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/pickamovie">PickAMovie</a></li>
+        <li><a href="/trends">Trends</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class='summary'>
+    <h4>Based on the subtitle you chose, a pie chart is plotted based on the importance of each topic to your particular movie. Trends of each topic (importance to movies and popularity based on box office) over the history of the movie industry are also plotted. </h4>
+  </div>
+
+  <div class='individual'>
+    <div class='left'>
+      <div class='header'>
+        <h3>INPUT TEXT</h3>
+      </div>
+      <div class='texts inputted-text'>
+        <a><i>{{textwords30}}</i></a>
+      </div>
+      <div class='header'>
+        <h3>TOP TOPICS</h3>
+      </div>
+      <div class='texts topic'>
+        <ul>
+        {% for topic, topicwords in topicwords20 %}
+        <li><a class='topic-name'>{{topic}}:</a> <br> {{topicwords}}</li><br>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class='right'>
+      <div class='header'>
+        <h3>PREDICTED BOX OFFICE</h3>
+      </div>
+      <div class='texts pred-boxoffice'>
+        <h1> {{bo_pred}}</h1>
+      </div>
+      <div class='header'>
+        <h3>TOPIC PIE CHART</h3>
+      </div>
+      <div id="chart">
+        <svg class="pie"></svg>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class='trend topic'>
+    <div class='header'>
+      <h3>TOPIC OCCURRENCE TREND</h3>
+    </div>
+    <div id="chart">
+      <svg class="area topic"></svg>
+    </div>
+  </div>
+
+  <div class='trend boxoffice'>
+    <div class='header'>
+      <h3>TOPIC POPULARITY TREND</h3>
+    </div>
+    <div id="chart">
+      <svg class="area boxoffice"></svg>
+    </div>
+  </div>
+
+  <div class='footnote'>
+  </div>
+
+
+
+  
+  <script>
+  
+      var data1 = [
+      {% for topic, value in values %}
+      {
+        "label": "{{topic}}",
+        "value": {{value}}
+      }
+      {% if not loop.last %},
+      {% endif %}
+      {% endfor %}
+      ];
+
+    nv.addGraph(function(){
+        var chart1 = nv.models.pieChart()
+            .x(function(d) {return d.label})
+            .y(function(d) {return d.value})
+            .showLabels(false);
+        d3.select("#chart svg.pie")
+            .datum(data1)
+            .transition().duration(350)
+            .call(chart1);
+        nv.utils.windowResize(function() { chart1.update() });
+        return chart1;
+        });
+
+
+
+    d3.json("../static/files/W.json", function(error, data2){
+      var pdata = [];
+      var  keys = [{% for index in indices %}
+                    "{{index}}"
+                    {% if not loop.last %},
+                    {% endif %}
+                  {% endfor %}
+                  ]
+
+      var  topics = [{% for topic in topics %}
+                    "{{topic}}"
+                    {% if not loop.last %},
+                    {% endif %}
+                  {% endfor %}
+                  ]
+      // for (var key of keys) {
+      for (var i = 0; i < keys.length; i++){
+        var temp = [];
+        var key = keys[i];
+        var topic = topics[i];
+        for (var year in data2[key]) {
+          temp.push({x: +year, y: +data2[key][year]});
+        }
+        pdata.push({values:temp, key:topic, area:true});
+      }
+
+      nv.addGraph(function(){
+        var chart2 = nv.models.lineChart()
+            .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+            .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+            // .transitionDuration(350)  //how fast do you want the lines to transition?
+            .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+            .showYAxis(true)        //Show the y-axis
+            .showXAxis(true)        //Show the x-axis
+            .interpolate("monotone")
+            ;
+
+        chart2.xAxis     //Chart x-axis settings
+            .axisLabel('Year')
+            .tickFormat(d3.format('r'));
+
+        chart2.yAxis     //Chart y-axis settings
+            .axisLabel('Topic Occurrence Index')
+            .tickFormat(d3.format('.04f'));
+
+        /* Done setting the chart up? Time to render it!*/
+        // var myData = sinAndCos();   //You need data...
+
+        d3.select('#chart svg.topic')    //Select the <svg> element you want to render the chart in.   
+            .datum(pdata)         //Populate the <svg> element with chart data...
+            .call(chart2);          //Finally, render the chart!
+
+        //Update the chart when window resizes.
+        nv.utils.windowResize(function() { chart2.update() });
+        return chart2;
+      })
+    });
+  
+
+
+
+    d3.json("../static/files/P.json", function(error, data3){
+      var pdata = [];
+      var  keys = [{% for index in indices %}
+                    "{{index}}"
+                    {% if not loop.last %},
+                    {% endif %}
+                  {% endfor %}
+                  ]
+                  // "%s", "%s", "%s", "%s", "%s"]
+      var  topics = [{% for topic in topics %}
+                    "{{topic}}"
+                    {% if not loop.last %},
+                    {% endif %}
+                  {% endfor %}
+                  ]
+      // for (var key of keys) {
+      for (var i = 0; i < keys.length; i++){
+        var temp = [];
+        var key = keys[i];
+        var topic = topics[i];
+        for (var year in data3[key]) {
+          temp.push({x: +year, y: +data3[key][year]});
+        }
+        pdata.push({values:temp, key:topic, area:true});
+      }
+
+      nv.addGraph(function(){
+        var chart3 = nv.models.lineChart()
+            .margin({left: 100})  //Adjust chart margins to give the x-axis some breathing room.
+            .useInteractiveGuideline(true)  //We want nice looking tooltips and a guideline!
+            // .transitionDuration(350)  //how fast do you want the lines to transition?
+            .showLegend(true)       //Show the legend, allowing users to turn on/off line series.
+            .showYAxis(true)        //Show the y-axis
+            .showXAxis(true)        //Show the x-axis
+            .interpolate("monotone")
+            ;
+
+        chart3.xAxis     //Chart x-axis settings
+            .axisLabel('Year')
+            .tickFormat(d3.format('r'));
+
+        chart3.yAxis     //Chart y-axis settings
+            .axisLabel('Partial Contribution to Box Office')
+            .tickFormat(d3.format('d'));
+
+        /* Done setting the chart up? Time to render it!*/
+        // var myData = sinAndCos();   //You need data...
+
+        d3.select('#chart svg.boxoffice')    //Select the <svg> element you want to render the chart in.   
+            .datum(pdata)         //Populate the <svg> element with chart data...
+            .call(chart3);          //Finally, render the chart!
+
+        //Update the chart when window resizes.
+        nv.utils.windowResize(function() { chart3.update() });
+        return chart3;
+      })
+    });
+ 
+  </script>
+  
+</body>
+  
+</html>
