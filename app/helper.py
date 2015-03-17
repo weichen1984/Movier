@@ -10,6 +10,9 @@ stemmer = SnowballStemmer("english")
 def check_text(line):
     '''
     check if each line of srt file is text
+    if a line is pure digit, return an empty string
+    if a line is time line, return an empty string also
+    otherwise, return the text
     '''
     line = line.strip()
     if '-->' in line or line == '':
@@ -24,7 +27,8 @@ def check_text(line):
 
 def extract_text(fn, encoding):
     '''
-    extract text from srt with the encoding
+    extract text from srt with the given encoding system
+    use check_text to extract text for each line of the file
     '''
     tt = []
     with io.open(fn, 'r', encoding=encoding) as g:
@@ -39,7 +43,10 @@ def extract_text(fn, encoding):
 
 def extract_file(fn):
     '''
-    extract text from srt file
+    extract text from srt file using extract_text after
+    finding the encoding system
+    this function is neccessary since files come in with
+    all kinds of encoding
     '''
     try:
         f = open(fn)
@@ -54,12 +61,32 @@ def extract_file(fn):
 
     return text
 
+
 def clean(docs):
     '''
     get rid of <> and {} tags, links (with and without)
     '''
-    regex = re.compile('{\d+}|\w+\.com|<.+?>|((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)')
+    regex = re.compile('{\d+}' +            # { } tags
+                       '|' +
+                       '\w+\.com' +         # xxx.com: partial link
+                       '|' +
+                       '<.+?>' +            # < > tags
+                       '|' +
+                       # below get rid of other link
+                       '((([A-Za-z]{3,9}:' +
+                       '(?:\/\/)?)' +
+                       '(?:[\-;:&=\+\$,\w]+@)?' +
+                       '[A-Za-z0-9\.\-]+' +
+                       '|' +
+                       '(?:www\.' +
+                       '|' +
+                       '[\-;:&=\+\$,\w]+@)' +
+                       '[A-Za-z0-9\.\-]+)' +
+                       '((?:\/[\+~%\/\.\w\-_]*)?\??' +
+                       '(?:[\-\+=&;%@\.\w_]*)#?' +
+                       '(?:[\.\!\/\\\w]*))?)')
     return [regex.sub(' ', doc) for doc in docs]
+
 
 def tokenize(doc):
     '''
@@ -67,4 +94,3 @@ def tokenize(doc):
     '''
     tokenizer = RegexpTokenizer("\w{3,}")
     return [stemmer.stem(x) for x in tokenizer.tokenize(doc)]
-

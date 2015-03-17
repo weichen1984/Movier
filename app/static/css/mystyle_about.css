@@ -13,8 +13,6 @@ html, body{
     height: auto;
 }
 
-
-
 text {
     font: 12px sans-serif;
 }
@@ -35,6 +33,11 @@ h2.project{
     font-weight: 700;
 }
 
+h2.project > a:link,
+h2.project > a:visited {
+    text-decoration: none;
+    color: #fff;
+}
 
 .nav {
     color:#fff;
@@ -150,3 +153,13 @@ svg {
     height: 600px;
     background-color: #FFFFFF;
 }
+
+img {
+    /*margin: 30px 30px 0 30px;*/
+    width: 700px;
+    height: 400px;
+    /*padding: 30px;*/
+}
+
+
+

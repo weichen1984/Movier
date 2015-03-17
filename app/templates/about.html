@@ -11,12 +11,13 @@
 <body>
 
     <div class='navbar'>
-        <h2 class="project">Movier</h2>
+        <h2 class="project"><a href="/#">Movier<a></h2>
         <nav>
             <ul class="nav">
                 <li><a href="/#">Home</a></li>
                 <li><a href="#">About</a></li>
                 <li><a href="/pickamovie">PickAMovie</a></li>
+                <li><a href="/predict">Predict</a></li>
                 <li><a href="/trends">Trends</a></li>
             </ul>
         </nav>
@@ -89,31 +90,113 @@
         <div class='header'>
             <h3><a name='analysis'>Analysis</a></h3>
         </div>
+        <div class='mindmap'>
+            <img src='../static/images/mindmap.png' width="700px" height="400px">
+        </div>
         <div class='content'>
-            <p> Scrape data from the data sources as mentioned above and dump them into MongoDB </p>
-            <br>
-            <p> Clean data so that each item corresponds to one IMDb ID and has attributes such as texts for subtitles, various ratings, release date, box office and etc </p>
-            <br>
-            <p> Run TF-IDF on subtitles </p>
-            <br>
-            <p> Perform a Non-Negative Matrix Factorization on the TF-IDF matrix</p>
-            <br>
-            <p>Investigate the features and pick the top K1 latent features</p>
-            <br>
-            <p>Analyze and visualize the change of these features over time</p>
+            <ol>
+                <li> Build custom scraper to scrape different aspects of movies. 
+                    <ul> 
+                        <li> The pool of movies to collect data for are determined from the IMDb year search engine where only feature movies are listed and at the same time stored the movie information such as IMDb id title, and release year for each movie. </li>
+                        <li>Then according to the IMDb ids scrape box office data from IMDb business site. The above are dumped into MongoDB.</li>
+                        <li>Most subtitles are generously provided by <a href="http://www.opensubtitles.org">opensubtitles.org</a>. I also built a custom scaper to scrape the rest of the subtitles from <a href="http://subscene.com"> subscene.com</a>.</li>
+                    </ul>
+                </li>
+                <li> Clean data 
+                    <ul>
+                        <li> srt_to_raw.py: transform srt subtitles to texts: subtitles are uploaded from different computers and the encodings can be quite different. I built a custom decoding and encoding routine for these files, which extracts only the texts, not the numbering or timestamp in srt files. </li> 
+                        <li> raw_to_clean.py: transform text files to clean text files: no punctuation, only words with lengths that are greater than 3 and Snowball Stemming. </li>
+                    </ul>
+                </li>
+
+                <li> Run Text Vectorizer TF-IDF on cleaned subtitles and get a m*n dimension TF-IDF matrix X, 
+                    <ul>
+                        <li>m is the number of movies with subtitles, in this case is 12193; </li> 
+                        <li>n is the number of words/tokens whose frequencies are listed; </li> 
+                        <li> I removed the English stopwords chose words that have document frequency greater than 0.015 and lower than 0.8, in which case, n is 6679. </li>
+                    </ul>
+                </li>
+
+                <li> Perform a Non-Negative Matrix Factorization on the TF-IDF matrix to extract K latent features/topics. 
+                    <ul>
+                        <li> The K I chose is 200;</li> 
+                        <li> Now X ~ H * W, where H is a m*k dimension matrix, W is a k*n dimension matrix;</li> 
+                        <li> Each column of H corresponds to the occurrence index for one latent feature/topic;</li> 
+                        <li> Each row of H corresponds to a topic "decomposition" vector for each movie;</li> 
+                        <li> Each row of W is a latent feature defined by word frequency vector, the top occurred words within a latent feature is characteristic to the feature and can be used to identify the meaning of each latent topic. </li>
+                    </ul>
+                </li>
+
+                <li>Investigate the extracted topics and identify the topics that have strong singal on one subject and manually assign names to them.</li>
+
+                <li>Analyze and visualize the change of these features over time.</li>
+
+                <li>Use the H matrix as predictor and box office as target, I did a grid search between Ridge Regressor and Random Forest Regressor. It turned out that Random Forest Regressor with max tree depth of 10, minimum samples split of 3 gave the best R square 27%.</li>
+            </ol>
         </div>
     </div>
 
     <div class='documentation'>
-        <a name='app'></a>
+        <div class='header'>
+            <h3><a name='app'>Documentation</a></h3>
+        </div>
+        <div class='content'>
+        <ol>
+        <li>Go to the "<a href="/pickamovie">PickAMovie</a>" page. </li>
+        <li>Upload one English subtitle or script, click on the "Upload" button will redirect you to the prediction result page. Notice the limitation of the app.</li>
+        <li><a name='predict_layout'>Layout of the Prediction Result page: </a></li>
+            <ul>
+                <li> INPUT TEXT: the cleaned text for your upload srt; </li>
+                <li> TOP TOPIC: the top 5 labeled topics that are present in the movie subtitle; </li>
+                <li> TOPIC PIE CHART: d3 pie chart for the top 5 topics with interactive visualization; </li>
+                <li> PREDICTED BOX OFFICE: predicted box office based on the topic occurrence index for the 200 topics using a trained Random Forest Regression model (the model acheives a R square of 27% solely based on the subtitles); </li>
+                <li> TOPIC OCCURRENCE TREND: average topic occurrence indices vs year for the top 5 topics within the movie; </li>
+                <li> TOPIC POPULARITY TREND: median fractional box office for the top 5 topics naively calculated by multiplying the fraction one topic contributes to a movie and the box office of this movie vs year. </li>
+            </ul>
+        <li>Go to the "<a href="/trends">Trends</a>" page:
+            <ul>
+                <li> TOPICS: they are buttons that you can click on to choose a certain topic to be displayed on the two trend charts on the right side. </li>
+                <li>  TOPIC OCCURRENCE TREND: average topic occurrence indices vs year for the topics at your choice; </li>
+                <li> TOPIC POPULARITY TREND: median fractional box office for the topics at your choice naively calculated by multiplying the fraction one topic contributes to a movie and the box office of this movie vs year. </li>
+            </ul>
+        </li>
+        </ol>
+        </div>
     </div>
 
     <div class='tools'>
-        <a name='tools'></a>
+        <div class='header'>
+            <h3><a name='tools'>Tools</a></h3>
+        </div>
+        <div class='content'>
+            <ol>
+                <li><a href="https://www.python.org/">Python</a>: the main coding language for this project.</li>
+                <li>WWW: <a href="http://www.imdb.com/">IMDb</a>, <a href="http://www.opensubtitles.org/">opensubtitles.org</a>, <a href="http://subscene.com/">subscene.com</a>. </li>
+                <li><a href="http://www.crummy.com/software/Beautifulsoup/">Beautiful Soup</a>: a Python library designed for web-scraping. It provides strong parse power especially HTML. </li>
+                <li><a href="http://www.mongodb.org/">MongoDB</a>: a database used to dump raw and clean data.</li>
+                <li><a href="http://api.mongodb.org/python/current/">pymongo</a>: a Python library that enables Python code to interact with MongoDB. </li>
+                <li><a href="http://www.nltk.org/">NLTK</a>: Natual Language Toolkit, a Python library that provides support for Natural Language Processing including stopwords lists, word Stemmer and Lemmatizer and etc. </li>
+                <li><a href="http://scikit-learn.org/">sklearn</a>: Scikit-Learn, a Python library that provides all sorts of machine learning libraries and packages. </li>
+                <li><a href="http://flask.pocoo.org/">Flask</a>: a microframework for Python based on Werkzeug, Jinja 2. </li>
+                <li><a href="http://d3js.org/">d3.js</a>: Data-Driven Documents, a JavaScript Library that helps interactively visualizing data and telling stories about the data. </li>
+                <li><a href="http://nvd3.org/">nvd3</a>: a JavaScript wrapper for d3.js. </li>
+                <li><a href="http://tools.medialab.sciences-po.fr/iwanthue/">i want hue</a>: colors for data scientists. It generates and refines palettes of optimally distinct colors.</li>
+            </ol>
+        </div>
     </div>
 
     <div class='credits'>
-        <a name='credits'></a>
+        <div class="header">
+            <h3><a name='credits'>Credits</a></h3>
+        </div>
+        <div class="content">
+            Huge Thanks To:
+            <ul>
+                <li><a href="http://opensubtitles.org/">opensubtitles.org</a> for providing me most of the data</li>
+                <li><a href="http://www.zipfianacademy.com/">Galvanize gSchool / Zipfian Academy</a> for equipping me with solid machine learning skills and solidifying my programming skills</li>
+                <li>Fellow Students for many many insightful discusssions, especially Alix Melchy, Iuliana Pascu and Ricky Kwok. </li>
+            </ul>
+        </div>
     </div>
 
     </div>

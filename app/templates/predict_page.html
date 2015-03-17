@@ -12,19 +12,20 @@
 
 
   <div class='navbar'>
-    <h2 class="project">Movier</h2>
+    <h2 class="project"><a href="/#">Movier<a></h2>
     <nav>
       <ul class="nav">
         <li><a href="/#">Home</a></li>
         <li><a href="/about">About</a></li>
         <li><a href="/pickamovie">PickAMovie</a></li>
+        <li><a href="#">Predict</a></li>
         <li><a href="/trends">Trends</a></li>
       </ul>
     </nav>
   </div>
 
   <div class='summary'>
-    <h4>Based on the subtitle you chose, a pie chart is plotted based on the importance of each topic to your particular movie. Trends of each topic (importance to movies and popularity based on box office) over the history of the movie industry are also plotted. </h4>
+    <h4>Based on the subtitle you chose, a pie chart is plotted based on the importance of each topic to your particular movie. Trends of each topic (importance to movies and popularity based on box office) over the history of the movie industry are also plotted. A description of the layout for this page can be found <a href="/about#predict_layout">here</a>. </h4>
   </div>
 
   <div class='individual'>
@@ -106,7 +107,7 @@
         var chart1 = nv.models.pieChart()
             .x(function(d) {return d.label})
             .y(function(d) {return d.value})
-            .showLabels(false);
+            .showLabels(true);
         d3.select("#chart svg.pie")
             .datum(data1)
             .transition().duration(350)
@@ -162,8 +163,6 @@
             .axisLabel('Topic Occurrence Index')
             .tickFormat(d3.format('.04f'));
 
-        /* Done setting the chart up? Time to render it!*/
-        // var myData = sinAndCos();   //You need data...
 
         d3.select('#chart svg.topic')    //Select the <svg> element you want to render the chart in.   
             .datum(pdata)         //Populate the <svg> element with chart data...
@@ -220,7 +219,7 @@
             .tickFormat(d3.format('r'));
 
         chart3.yAxis     //Chart y-axis settings
-            .axisLabel('Partial Contribution to Box Office')
+            .axisLabel('Fractional Box Office')
             .tickFormat(d3.format('d'));
 
         /* Done setting the chart up? Time to render it!*/

@@ -37,6 +37,12 @@ h2.project{
     font-weight: 700;
 }
 
+h2.project > a:link,
+h2.project > a:visited {
+    text-decoration: none;
+    color: #fff;
+}
+
 
 .nav {
     color:#fff;
