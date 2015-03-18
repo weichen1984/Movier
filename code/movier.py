@@ -23,20 +23,21 @@ class Movier(object):
         self.top_words = {}
         self.stemmer = SnowballStemmer("english")
 
-
     def clean(self, docs):
         '''
         get rid of <> and {} tags, links (with and without)
         '''
 
         regex = re.compile('{\d+}|\w+\.com|<.+?>|'
-            + '((([A-Za-z]{3,9}:(?:\/\/)?)'
-            + '(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|'
-            + '(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)'
-            + '((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?'
-            + '(?:[\.\!\/\\\w]*))?)')
+                           + '((([A-Za-z]{3,9}:(?:\/\/)?)'
+                           + '(?:[\-;:&=\+\$,\w]+@)?'
+                           + '[A-Za-z0-9\.\-]+|'
+                           + '(?:www\.|[\-;:&=\+\$,\w]+@)'
+                           + '[A-Za-z0-9\.\-]+)'
+                           + '((?:\/[\+~%\/\.\w\-_]*)?\??'
+                           + '(?:[\-\+=&;%@\.\w_]*)#?'
+                           + '(?:[\.\!\/\\\w]*))?)')
         return [regex.sub(' ', doc) for doc in docs]
-
 
     def tokenize(self, doc):
         '''
@@ -45,7 +46,6 @@ class Movier(object):
 
         tokenizer = RegexpTokenizer("\w{3,}")
         return [self.stemmer.stem(x) for x in tokenizer.tokenize(doc)]
-
 
     def fit(self, docs, clean=False):
         '''
@@ -76,7 +76,6 @@ class Movier(object):
 
         return X, H, W
 
-
     def transfrom_predict(self, docs):
         '''
         transform and predict based on raw text from docs
@@ -86,8 +85,6 @@ class Movier(object):
         X = self.tfidf.transform(docs)
         H = self.nmf.transform(X)
         return H
-
-
 
     def top_n_words(self, n):
         '''
@@ -107,7 +104,7 @@ class Movier(object):
 
 def load_data():
     '''
-    load
+    load cleaned text data
     '''
 
     fdir = '../data/txt/clean_w/'
@@ -115,30 +112,26 @@ def load_data():
     for year in xrange(1914, 2015):
         if year % 10 == 0:
             print 'year = %s' % year
-        dft = pd.read_csv(fdir + 'subtext' + str(year), delimiter='\t', header=None)
+        dft = pd.read_csv(fdir + 'subtext' + str(year),
+                          delimiter='\t', header=None)
         dfs.append(dft)
     df = pd.concat(dfs, axis=0)
     return df
 
 
 def build_all():
+    '''
+    pipeline to build the topic model
+    '''
+
     df = load_data()
     docs = list(df.iloc[:, 1].values)
-    kw_tfidf = {'max_df': 0.9, 'stop_words': 'english', 'min_df':0.015, 'tokenizer':None, 'token_pattern': "\w{3,}"}
+    kw_tfidf = {'max_df': 0.9, 'stop_words': 'english', 'min_df': 0.015,
+                'tokenizer': None, 'token_pattern': "\w{3,}"}
     kw_nmf = {'n_components': 200, 'max_iter': 300}
-    kw_kmeans = {'n_clusters': 30}
-    model = Movier(kw_tfidf=kw_tfidf, kw_nmf=kw_nmf, kw_kmeans=kw_kmeans)
+    model = Movier(kw_tfidf=kw_tfidf, kw_nmf=kw_nmf)
     model.fit(docs)
-    pickle.dump(model, open('all_maxdf09.pkl', 'wb'))
+    pickle.dump(model, open('all.pkl', 'wb'))
 
 if __name__ == '__main__':
-    # build_model(40)
     build_all()
-
-
-
-
-
-
-
-
