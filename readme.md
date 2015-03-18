@@ -46,14 +46,15 @@ The data set used in this project consists of English subtitles for the 12,193 m
 2. Clean data
     * srt_to_raw.py: transform srt subtitles to texts: subtitles are uploaded from different computers and the encodings can be quite different. I built a custom decoding and encoding routine for these files, which extracts only the texts, not the numbering or timestamp in srt files.
     * raw_to_clean.py: transform text files to clean text files: no punctuation, only words with lengths that are greater than 3 and Snowball Stemming.
-3. Run Text Vectorizer TF-IDF on cleaned subtitles and get a m*n dimension TF-IDF matrix X,
+    
+3. Run Text Vectorizer TF-IDF on cleaned subtitles and get a m x n dimension TF-IDF matrix X,
     * m is the number of movies with subtitles, in this case is 12193;
     * n is the number of words/tokens whose frequencies are listed;
     * I removed the English stopwords chose words that have document frequency greater than 0.015 and lower than 0.8, in which case, n is 6679.
 
 4. Perform a Non-Negative Matrix Factorization on the TF-IDF matrix to extract K latent features/topics.
     * The K I chose is 200;
-    * Now $$X ~ H * W$$, where H is a $$m * k$$ dimension matrix, W is a $$k * n$$ dimension matrix;
+    * Now X ~ H x W, where H is a m x k dimension matrix, W is a k x n dimension matrix;
     * Each column of H corresponds to the occurrence index for one latent feature/topic;
     * Each row of H corresponds to a topic "decomposition" vector for each movie;
     * Each row of W is a latent feature defined by word frequency vector, the top occurred words within a latent feature is characteristic to the feature and can be used to identify the meaning of each latent topic.
