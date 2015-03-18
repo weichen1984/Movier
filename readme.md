@@ -53,7 +53,7 @@ The data set used in this project consists of English subtitles for the 12,193 m
 
 4. Perform a Non-Negative Matrix Factorization on the TF-IDF matrix to extract K latent features/topics.
     * The K I chose is 200;
-    * Now X ~ H * W, where H is a m*k dimension matrix, W is a k*n dimension matrix;
+    * Now $$X ~ H * W$$, where H is a $$m * k$$ dimension matrix, W is a $$k * n$$ dimension matrix;
     * Each column of H corresponds to the occurrence index for one latent feature/topic;
     * Each row of H corresponds to a topic "decomposition" vector for each movie;
     * Each row of W is a latent feature defined by word frequency vector, the top occurred words within a latent feature is characteristic to the feature and can be used to identify the meaning of each latent topic.
