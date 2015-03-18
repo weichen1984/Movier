@@ -24,19 +24,19 @@ Movier, this project, serves two purpose:
 
 #### Data Source:
 
-    General Movie Information (ID, title, year, box office): [IMDb](imdb.com) 
-    Movie English Subtitles: [opensubtitles.org](opensubtitles.org) and [subscene.com](subscene.com) 
+General Movie Information (ID, title, year, box office): [IMDb](imdb.com) 
+Movie English Subtitles: [opensubtitles.org](opensubtitles.org) and [subscene.com](subscene.com) 
 
 #### Data Scope:
 
-    The data set used in this project consists of English subtitles for the 12,193 movies out of a total of 59,690 feature movies produced in the US up to year 2014. Among the 12,193 movies, 6687 have domestic box office (US) available.
+The data set used in this project consists of English subtitles for the 12,193 movies out of a total of 59,690 feature movies produced in the US up to year 2014. Among the 12,193 movies, 6687 have domestic box office (US) available.
 
-    ![datascope](app/static/images/datascope.PNG)
+![datascope](app/static/images/datascope.PNG)
 
 
 ### Analysis:
 
-    ![mindmap](app/static/images/mindmap.PNG)
+![mindmap](app/static/images/mindmap.PNG)
 
 1. Build custom scraper to scrape different aspects of movies.
     * The pool of movies to collect data for are determined from the IMDb year search engine where only feature movies are listed and at the same time stored the movie information such as IMDb id title, and release year for each movie.
